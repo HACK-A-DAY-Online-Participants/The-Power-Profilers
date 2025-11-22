@@ -1,12 +1,26 @@
 {
   "name": "energy-lsp",
   "displayName": "Energy LSP",
-  "description": "Run energy-aware compiler and show usage",
-  "version": "1.0.0",
   "publisher": "rohin",
+  "description": "Energy-aware code profiler that sends your code to the Energy API for energy usage analysis.",
+  "version": "1.0.0",
   "engines": {
-    "vscode": "^1.70.0"
+    "vscode": "^1.90.0"
   },
+
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rohinnandan30n/EnergyProfiler2.0.git"
+  },
+
+  "categories": [
+    "Other",
+    "Linters",
+    "Programming Languages"
+  ],
+
+  "icon": "icon.png",
+
   "activationEvents": [
     "onStartupFinished",
     "onLanguage:python",
@@ -14,11 +28,15 @@
     "onLanguage:java",
     "onCommand:energyLSP.runEnergyCompile"
   ],
+
+  "main": "./out/extension.js",
+
   "contributes": {
     "commands": [
       {
         "command": "energyLSP.runEnergyCompile",
-        "title": "Run with Energy"
+        "category": "Energy",
+        "title": "⚡ Run with Energy"
       }
     ],
     "menus": {
@@ -28,22 +46,32 @@
           "when": "resourceLangId == python || resourceLangId == cpp || resourceLangId == java",
           "group": "navigation"
         }
+      ],
+      "commandPalette": [
+        {
+          "command": "energyLSP.runEnergyCompile",
+          "when": "editorLangId == python || editorLangId == cpp || editorLangId == java"
+        }
       ]
     }
   },
-  "main": "./out/extension.js",
+
   "scripts": {
     "build": "tsc -p ./",
     "watch": "tsc -w",
-    "compile": "tsc -p ./"
+    "compile": "tsc -p ./",
+    "package": "vsce package"
   },
+
   "dependencies": {
     "node-fetch": "^3.3.2",
-    "vscode-languageclient": "^8.0.2"
+    "vscode-languageclient": "^8.1.0"
   },
+
   "devDependencies": {
     "@types/node": "^24.10.1",
     "@types/vscode": "^1.90.0",
+    "@vscode/vsce": "^3.7.0",
     "typescript": "^5.6.3"
   }
 }

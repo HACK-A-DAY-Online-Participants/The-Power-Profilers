@@ -54,8 +54,8 @@ function activateClient(context) {
         ]
     };
     client = new node_1.LanguageClient("energyLsp", "Energy LSP", serverOptions, clientOptions);
-    const disposableClient = client.start();
-    context.subscriptions.push(disposableClient);
+    client.start();
+    context.subscriptions.push(client);
     // Register CodeLens Provider
     const codeLensProvider = vscode.languages.registerCodeLensProvider([{ language: "python" }, { language: "cpp" }, { language: "java" }], {
         provideCodeLenses(document) {
