@@ -1,0 +1,15 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "run-energy-api",
+            "type": "process",
+            "command": "python",
+            "args": ["server.py"],
+            "options": {
+                "cwd": "C:\\EnergyAPI"
+            },
+            "problemMatcher": []
+        }
+    ]
+}

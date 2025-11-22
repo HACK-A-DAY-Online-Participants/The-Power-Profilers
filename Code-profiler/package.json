@@ -1,0 +1,28 @@
+{
+    "name": "energy-lsp-extension",
+    "displayName": "Energy LSP Extension",
+    "description": "Extension to measure energy usage of code.",
+    "version": "1.0.0",
+    "publisher": "rohin",
+    "engines": {
+        "vscode": "^1.70.0"
+    },
+    "main": "./extension.js",
+
+    "activationEvents": [
+        "onCommand:energyLSP.runEnergyCompile"
+    ],
+
+    "contributes": {
+        "commands": [
+            {
+                "command": "energyLSP.runEnergyCompile",
+                "title": "Run with Energy"
+            }
+        ]
+    },
+
+    "scripts": {
+        "compile": "echo 'no build step'"
+    }
+}

@@ -1,0 +1,24 @@
+{
+  "name": "code-energy-lsp",
+  "version": "1.0.0",
+  "description": "LSP server that calls a local compile/energy API",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc -b",
+    "start": "node dist/server.js",
+    "clean": "rimraf dist"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "node-fetch": "2.6.7",
+    "vscode-languageserver": "^8.0.1",
+    "vscode-languageserver-textdocument": "^1.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/node-fetch": "^2.6.2",
+    "rimraf": "^5.0.0",
+    "typescript": "^5.1.0"
+  }
+}

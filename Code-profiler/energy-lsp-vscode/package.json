@@ -1,0 +1,49 @@
+{
+  "name": "energy-lsp",
+  "displayName": "Energy LSP",
+  "description": "Run energy-aware compiler and show usage",
+  "version": "1.0.0",
+  "publisher": "rohin",
+  "engines": {
+    "vscode": "^1.70.0"
+  },
+  "activationEvents": [
+    "onStartupFinished",
+    "onLanguage:python",
+    "onLanguage:cpp",
+    "onLanguage:java",
+    "onCommand:energyLSP.runEnergyCompile"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "energyLSP.runEnergyCompile",
+        "title": "Run with Energy"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "energyLSP.runEnergyCompile",
+          "when": "resourceLangId == python || resourceLangId == cpp || resourceLangId == java",
+          "group": "navigation"
+        }
+      ]
+    }
+  },
+  "main": "./out/extension.js",
+  "scripts": {
+    "build": "tsc -p ./",
+    "watch": "tsc -w",
+    "compile": "tsc -p ./"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2",
+    "vscode-languageclient": "^8.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "@types/vscode": "^1.90.0",
+    "typescript": "^5.6.3"
+  }
+}

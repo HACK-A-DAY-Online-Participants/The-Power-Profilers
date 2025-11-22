@@ -1,0 +1,5 @@
+{
+  "energyLsp.apiUrl": "http://127.0.0.1:3000",
+  "energyLsp.serverCommand": "python C:\\EnergyAPI\\server.py",
+  "energyLsp.serverCwd": "C:\\EnergyAPI"
+}

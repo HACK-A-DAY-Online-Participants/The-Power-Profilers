@@ -1,0 +1,7 @@
+{
+    "code-energy-lsp.serverPath": "node",
+    "code-energy-lsp.serverArgs": [
+        "${workspaceFolder}/lsp-server/dist/server.js",
+        "--stdio"
+    ]
+}

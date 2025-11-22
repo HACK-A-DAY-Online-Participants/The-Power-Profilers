@@ -1,0 +1,11 @@
+GET http://127.0.0.1:3000/
+
+###
+
+POST http://127.0.0.1:3000/compile
+Content-Type: application/json
+
+{
+  "language": "python",
+  "code": "print('hello from energy api')"
+}
