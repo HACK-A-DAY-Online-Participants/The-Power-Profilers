@@ -4,31 +4,36 @@ import time
 import sys
 import os
 
-def run_python(code):
-    """Run full Python code and measure time + simulated energy."""
+def run_python_with_trace(code):
+    """Run Python code and return energy + time + output."""
 
-    # Save code to a temporary file
     with tempfile.NamedTemporaryFile(delete=False, suffix=".py", mode="w") as tmp:
         tmp.write(code)
         tmp_path = tmp.name
 
     start = time.perf_counter()
 
-    proc = subprocess.run(
-        [sys.executable, tmp_path],
-        capture_output=True,
-        text=True
-    )
+    try:
+        proc = subprocess.run(
+            [sys.executable, tmp_path],
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
+    except Exception as e:
+        return {
+            "error": str(e)
+        }
 
     end = time.perf_counter()
     os.remove(tmp_path)
 
-    elapsed = end - start
-    energy = elapsed * 0.13  # Simple energy model
+    exec_time = round(end - start, 5)  # seconds
+    energy = round(exec_time * 0.13, 5)  # fake joule estimate
 
     return {
         "energy_j": energy,
-        "time_s": elapsed,
+        "time_s": exec_time,
         "stdout": proc.stdout,
         "stderr": proc.stderr,
         "return_code": proc.returncode

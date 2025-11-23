@@ -1,32 +1,44 @@
-import tempfile
 import subprocess
+import tempfile
+import time
 import os
-from exec_utils import run_with_energy
 
-def run_java(code):
+def compile_and_run_java(code):
     with tempfile.NamedTemporaryFile(delete=False, suffix=".java", mode="w") as tmp:
         tmp.write(code)
-        java_path = tmp.name
+        src_path = tmp.name
 
-    class_name = "Main"
-    os.rename(java_path, java_path.replace("tmp", class_name))
-    java_path = java_path.replace("tmp", class_name)
+    classname = os.path.basename(src_path).replace(".java", "")
 
-    compile_result = subprocess.run(
-        ["javac", java_path],
-        capture_output=True,
-        text=True
+    compile_proc = subprocess.run(
+        ["javac", src_path],
+        capture_output=True, text=True
     )
 
-    if compile_result.returncode != 0:
-        return {"error": compile_result.stderr}
+    if compile_proc.returncode != 0:
+        return {
+            "error": compile_proc.stderr
+        }
 
-    result = run_with_energy(["java", class_name])
+    start = time.perf_counter()
+    run_proc = subprocess.run(
+        ["java", classname],
+        capture_output=True, text=True
+    )
+    end = time.perf_counter()
 
-    os.remove(java_path)
-    try:
-        os.remove(class_name + ".class")
-    except:
-        pass
+    exec_time = round(end - start, 5)
+    energy = round(exec_time * 0.20, 5)
 
-    return result
+    class_file = classname + ".class"
+    if os.path.exists(class_file):
+        os.remove(class_file)
+    os.remove(src_path)
+
+    return {
+        "energy_j": energy,
+        "time_s": exec_time,
+        "stdout": run_proc.stdout,
+        "stderr": run_proc.stderr,
+        "return_code": run_proc.returncode
+    }
