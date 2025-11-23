@@ -2,24 +2,28 @@ import os
 import sys
 from flask import Flask, request, jsonify
 
+# Base directory
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 COMPILER_DIR = os.path.join(BASE_DIR, "compiler")
 sys.path.insert(0, COMPILER_DIR)
 
-# NEW import (correct one)
-from python import run_python_with_trace
+# Correct imports from compiler folder
+from python import run_python
 from cpp import compile_and_run_cpp
 from java import compile_and_run_java
 
 app = Flask(__name__)
 
+
 @app.get("/")
 def home():
     return {"message": "Energy API running"}
 
+
 @app.post("/compile")
 def compile_code():
     data = request.get_json()
+
     lang = data.get("language")
     code = data.get("code")
 
@@ -27,17 +31,32 @@ def compile_code():
         return jsonify({"error": "missing code"}), 400
 
     try:
+        # -----------------------------
+        # PYTHON
+        # -----------------------------
         if lang == "python":
-            return jsonify(run_python_with_trace(code))
+            result = run_python(code)
 
+        # -----------------------------
+        # C++
+        # -----------------------------
         elif lang == "cpp":
-            return jsonify(compile_and_run_cpp(code))
+            result = compile_and_run_cpp(code)
 
+        # -----------------------------
+        # JAVA
+        # -----------------------------
         elif lang == "java":
-            return jsonify(compile_and_run_java(code))
+            result = compile_and_run_java(code)
 
         else:
             return jsonify({"error": "Unsupported language"}), 400
+
+        # ---- Format energy & time ----
+        result["energy_j"] = float(f"{result['energy_j']:.5f}")
+        result["time_s"]   = float(f"{result['time_s']:.5f}")
+
+        return jsonify(result)
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
