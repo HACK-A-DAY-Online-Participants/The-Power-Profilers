@@ -1,173 +1,143 @@
-// app/page.tsx
+// app/page.tsx - Updated with page routing
 
 "use client";
 
-import { useState, useCallback } from "react";
-import { Zap, FileText, Flame } from "lucide-react";
+import { useState, useCallback, useEffect } from "react";
 
 // Layout components
 import { Sidebar } from "./components/layout/Sidebar";
 import { Header } from "./components/layout/Header";
 
-// Dashboard components
-import { MetricCards } from "./components/dashboard/MetricCard";
-import { TabNav } from "./components/dashboard/TabNav";
-
-// Editor components
-import { EditorPanel } from "./components/editor/EditorPanel";
-
-// Output components
-import { OutputPanel } from "./components/output/OutputPanel";
-import { EnergyComparison } from "./components/output/EnergyComparison";
-
-// Hooks
-import { useCodeRunner } from "./hooks/useCodeRunner";
-import { useEnergyAnalysis } from "./hooks/useEnergyAnalysis";
+// Page components
+import { DashboardView } from "./components/pages/DashboardView";
+import { HotspotsView } from "./components/pages/HotspotsView";
+import { FileAnalysisView } from "./components/pages/FileAnalysisView";
+import { MetricsView } from "./components/pages/MetricsView";
 
 // Types & Constants
-import { SupportedLanguage, MetricData } from "../lib/types";
-import { DEFAULT_CODE } from "../lib/constants";
+import { SupportedLanguage } from "@/lib/types";
+import { DEFAULT_CODE } from "@/lib/constants";
 
-// Tab configuration
-const TABS = [
-  { id: "compiler", label: "Compiler" },
-  { id: "leaderboard", label: "Leaderboard" },
-  { id: "achievements", label: "Achievements" },
-];
+const STORAGE_KEY_PREFIX = "code-profiler-code-";
+const STORAGE_LANGUAGE_KEY = "code-profiler-last-language";
 
-// Metrics data
-const METRICS: MetricData[] = [
-  {
-    label: "Energy Saved",
-    value: "1,234.5",
-    unit: "mJ",
-    subtitle: "vs. naive implementations",
-    icon: Zap,
-    color: "emerald",
-  },
-  {
-    label: "Files Optimized",
-    value: "24",
-    subtitle: "this week",
-    icon: FileText,
-    color: "violet",
-  },
-  {
-    label: "Day Streak",
-    value: "7",
-    subtitle: "days coding efficiently",
-    icon: Flame,
-    color: "amber",
-  },
-];
+export type PageView = "dashboard" | "hotspots" | "analysis" | "metrics";
 
-export default function DashboardPage() {
-  // Editor state
+export default function MainPage() {
+  const [currentPage, setCurrentPage] = useState<PageView>("dashboard");
   const [language, setLanguage] = useState<SupportedLanguage>("javascript");
-  const [code, setCode] = useState(DEFAULT_CODE.javascript);
-  const [activeTab, setActiveTab] = useState("compiler");
+  
+  const [codeByLanguage, setCodeByLanguage] = useState<Record<SupportedLanguage, string>>(() => {
+    return {
+      javascript: DEFAULT_CODE.javascript,
+      python: DEFAULT_CODE.python,
+      cpp: DEFAULT_CODE.cpp,
+      java: DEFAULT_CODE.java,
+    };
+  });
 
-  // Custom hooks for code execution and analysis
-  const { output, status, executionTime, isRunning, runCode } = useCodeRunner();
-  const {
-    patternAnalysis,
-    realMeasurement,
-    isAnalyzing,
-    isMeasuring,
-    error,
-    analyzeBoth,
-  } = useEnergyAnalysis();
+  // Load saved code
+  useEffect(() => {
+    try {
+      const savedLanguage = localStorage.getItem(STORAGE_LANGUAGE_KEY) as SupportedLanguage;
+      if (savedLanguage && ["javascript", "python", "cpp", "java"].includes(savedLanguage)) {
+        setLanguage(savedLanguage);
+      }
 
-  // Handle language change
+      const loadedCode: Record<string, string> = {};
+      const languages: SupportedLanguage[] = ["javascript", "python", "cpp", "java"];
+      
+      languages.forEach((lang) => {
+        const saved = localStorage.getItem(STORAGE_KEY_PREFIX + lang);
+        if (saved) {
+          loadedCode[lang] = saved;
+        }
+      });
+
+      if (Object.keys(loadedCode).length > 0) {
+        setCodeByLanguage((prev) => ({ ...prev, ...loadedCode }));
+      }
+    } catch (error) {
+      console.error("Error loading saved code:", error);
+    }
+  }, []);
+
+  // Save code
+  useEffect(() => {
+    try {
+      Object.entries(codeByLanguage).forEach(([lang, code]) => {
+        localStorage.setItem(STORAGE_KEY_PREFIX + lang, code);
+      });
+    } catch (error) {
+      console.error("Error saving code:", error);
+    }
+  }, [codeByLanguage]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_LANGUAGE_KEY, language);
+    } catch (error) {
+      console.error("Error saving language:", error);
+    }
+  }, [language]);
+
+  const currentCode = codeByLanguage[language];
+
   const handleLanguageChange = useCallback((newLang: SupportedLanguage) => {
     setLanguage(newLang);
-    setCode(DEFAULT_CODE[newLang]);
+    // Ensure code entry exists for new language (safety if defaults change)
+    setCodeByLanguage(prev => prev[newLang] ? prev : { ...prev, [newLang]: DEFAULT_CODE[newLang] });
   }, []);
 
-  // Handle code change
   const handleCodeChange = useCallback((newCode: string) => {
-    setCode(newCode);
-  }, []);
+    setCodeByLanguage((prev) => ({ ...prev, [language]: newCode }));
+  }, [language]);
 
-  // Run code and analyze (both pattern + real measurement)
-  const handleRun = useCallback(async () => {
-    await runCode(language, code);
-    await analyzeBoth(language, code);
-  }, [language, code, runCode, analyzeBoth]);
-
-  // Analyze only (both methods)
-  const handleAnalyze = useCallback(async () => {
-    await analyzeBoth(language, code);
-  }, [language, code, analyzeBoth]);
+  const handleReset = useCallback(() => {
+    if (confirm(`Reset ${language} code to default example?`)) {
+      setCodeByLanguage((prev) => ({ ...prev, [language]: DEFAULT_CODE[language] }));
+    }
+  }, [language]);
 
   return (
     <div className="flex h-screen bg-slate-950 text-slate-100 overflow-hidden">
-      {/* Sidebar */}
-      <Sidebar />
+      {/* Collapsible Sidebar */}
+      <Sidebar currentPage={currentPage} onPageChange={(page: PageView) => setCurrentPage(page)} />
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col overflow-hidden bg-linear-to-br from-slate-900 via-slate-900 to-violet-950/30">
         {/* Header */}
         <Header />
 
-        {/* Scrollable content */}
-        <div className="flex-1 overflow-auto p-6">
-          {/* Metric Cards */}
-          <div className="mb-6">
-            <MetricCards metrics={METRICS} />
-          </div>
-
-          {/* Tabs */}
-          <div className="mb-4">
-            <TabNav
-              tabs={TABS}
-              activeTab={activeTab}
-              onChange={setActiveTab}
+        {/* Page Content */}
+        <div className="flex-1 overflow-auto custom-scrollbar">
+          {currentPage === "dashboard" && (
+            <DashboardView
+              language={language}
+              code={currentCode}
+              onLanguageChange={handleLanguageChange}
+              onCodeChange={handleCodeChange}
+              onReset={handleReset}
             />
-          </div>
-
-          {/* Main Grid: Editor + Output */}
-          <div className="grid grid-cols-5 gap-4" style={{ minHeight: "500px" }}>
-            {/* Code Editor - takes 3 columns */}
-            <div className="col-span-3">
-              <EditorPanel
-                language={language}
-                code={code}
-                onLanguageChange={handleLanguageChange}
-                onCodeChange={handleCodeChange}
-                onRun={handleRun}
-                onAnalyze={handleAnalyze}
-                isRunning={isRunning}
-                isAnalyzing={isAnalyzing || isMeasuring}
-              />
-            </div>
-
-            {/* Right Panel - takes 2 columns */}
-            <div className="col-span-2 flex flex-col gap-4">
-              {/* Output Panel */}
-              <OutputPanel
-                output={output}
-                status={status}
-                executionTime={executionTime}
-              />
-
-              {/* Energy Analysis Panel - NEW COMPONENT */}
-              <div className="flex-1 rounded-2xl border border-slate-700/50 bg-linear-to-br from-slate-800/30 to-slate-900/50 overflow-hidden">
-                <EnergyComparison
-                  patternAnalysis={patternAnalysis}
-                  realMeasurement={realMeasurement}
-                  language={language}
-                />
-              </div>
-
-              {/* Error Display */}
-              {error && (
-                <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-lg">
-                  <p className="text-sm text-rose-300">⚠️ {error}</p>
-                </div>
-              )}
-            </div>
-          </div>
+          )}
+          
+          {currentPage === "hotspots" && (
+            <HotspotsView
+              language={language}
+              code={currentCode}
+            />
+          )}
+          
+          {currentPage === "analysis" && (
+            <FileAnalysisView
+              language={language}
+              code={currentCode}
+            />
+          )}
+          
+          {currentPage === "metrics" && (
+            <MetricsView />
+          )}
         </div>
       </main>
     </div>

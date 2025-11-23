@@ -1,6 +1,6 @@
 // lib/types.ts
 
-export type SupportedLanguage = "javascript" | "python" | "cpp";
+export type SupportedLanguage = "javascript" | "python" | "cpp" | "java";
 
 export interface RunRequest {
   language: SupportedLanguage;
@@ -42,7 +42,7 @@ export interface EnergyAnalysisResponse extends EnergyAnalysis {
   suggestions: string[];
 }
 
-// NEW: Real energy measurement from CodeCarbon
+// Real energy measurement from CodeCarbon/PowerMonitor
 export interface RealEnergyMeasurement {
   status: "success" | "error";
   output: string;
@@ -60,7 +60,7 @@ export interface RealEnergyMeasurement {
     gpu_energy: string;
     ram_energy: string;
   };
-  measurement_method: "codecarbon";
+  measurement_method: "codecarbon" | "powermonitor" | "system-metrics";
 }
 
 export interface MetricData {

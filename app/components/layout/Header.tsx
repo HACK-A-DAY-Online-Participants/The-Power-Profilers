@@ -3,6 +3,7 @@
 "use client";
 
 import { Trophy, User } from "lucide-react";
+import { StorageManager } from "../editor/StorageManager";
 
 interface HeaderProps {
   title?: string;
@@ -30,8 +31,10 @@ export function Header({
 
         {/* User Info */}
         <div className="flex items-center gap-4">
-          <LevelBadge level={level} />
-          <UserAvatar />
+          <StorageManager />
+          {/* <LevelBadge level={level} />
+          <UserAvatar /> */}
+
         </div>
       </div>
     </header>

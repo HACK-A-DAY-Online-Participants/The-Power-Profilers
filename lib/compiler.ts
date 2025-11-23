@@ -47,6 +47,7 @@ async function runWithJudge0(language: SupportedLanguage, code: string, stdin?: 
     javascript: 63, // Node.js
     python: 71,     // Python 3
     cpp: 54,        // C++ (GCC)
+    java: 62,       // Java (OpenJDK 13.0.1)
   };
   const configId = judge0Ids[language];
   const startTime = Date.now();
@@ -100,6 +101,7 @@ async function runWithJDoodle(language: SupportedLanguage, code: string, stdin?:
     javascript: { language: "nodejs", versionIndex: "4" },
     python: { language: "python3", versionIndex: "3" },
     cpp: { language: "cpp17", versionIndex: "0" },
+    java: { language: "java", versionIndex: "4" },
   };
   const config = jdoodleConfig[language];
   const startTime = Date.now();
