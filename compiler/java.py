@@ -1,21 +1,32 @@
-import tempfile, os
-from .exec_utils import run_command_with_energy
+import tempfile
+import subprocess
+import os
+from exec_utils import run_with_energy
 
-def compile_and_run_java(code: str):
-    with tempfile.TemporaryDirectory() as td:
-        src = os.path.join(td, "Main.java")
+def run_java(code):
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".java", mode="w") as tmp:
+        tmp.write(code)
+        java_path = tmp.name
 
-        with open(src, "w") as f:
-            f.write(code)
+    class_name = "Main"
+    os.rename(java_path, java_path.replace("tmp", class_name))
+    java_path = java_path.replace("tmp", class_name)
 
-        compile_result = run_command_with_energy(["javac", src])
+    compile_result = subprocess.run(
+        ["javac", java_path],
+        capture_output=True,
+        text=True
+    )
 
-        if compile_result["return_code"] != 0:
-            return {"compile_error": True, **compile_result}
+    if compile_result.returncode != 0:
+        return {"error": compile_result.stderr}
 
-        run_result = run_command_with_energy(["java", "-cp", td, "Main"])
+    result = run_with_energy(["java", class_name])
 
-        return {
-            "compile": compile_result,
-            "run": run_result
-        }
+    os.remove(java_path)
+    try:
+        os.remove(class_name + ".class")
+    except:
+        pass
+
+    return result

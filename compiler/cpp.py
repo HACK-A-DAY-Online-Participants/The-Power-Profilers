@@ -1,23 +1,27 @@
-import tempfile, os
-from .exec_utils import run_command_with_energy
+import tempfile
+import os
+import subprocess
+from exec_utils import run_with_energy
 
-def compile_and_run_cpp(code: str):
-    with tempfile.TemporaryDirectory() as td:
-        src = os.path.join(td, "main.cpp")
-        exe = os.path.join(td, "a.exe")
+def run_cpp(code):
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".cpp", mode="w") as tmp:
+        tmp.write(code)
+        cpp_path = tmp.name
 
-        with open(src, "w") as f:
-            f.write(code)
+    exe_path = cpp_path + ".exe"
 
-        compile_cmd = ["g++", src, "-O2", "-o", exe]
-        compile_result = run_command_with_energy(compile_cmd)
+    compile_result = subprocess.run(
+        ["g++", cpp_path, "-o", exe_path],
+        capture_output=True,
+        text=True
+    )
 
-        if compile_result["return_code"] != 0:
-            return {"compile_error": True, **compile_result}
+    if compile_result.returncode != 0:
+        return {"error": compile_result.stderr}
 
-        run_result = run_command_with_energy([exe])
+    result = run_with_energy([exe_path])
 
-        return {
-            "compile": compile_result,
-            "run": run_result
-        }
+    os.remove(cpp_path)
+    os.remove(exe_path)
+
+    return result

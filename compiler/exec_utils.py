@@ -1,30 +1,40 @@
 import subprocess
+import tempfile
 import time
-import psutil
+import sys
+import os
 
-def run_command_with_energy(cmd):
-    start = time.time()
-    process = psutil.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+def run_with_energy(cmd, input_code=None):
+    with tempfile.NamedTemporaryFile(delete=False, mode="w", suffix=".txt") as tmp:
+        if input_code:
+            tmp.write(input_code)
+        tmp_path = tmp.name
 
-    p = psutil.Process(process.pid)
+    start = time.perf_counter()
 
-    energy_used = 0
     try:
-        while process.poll() is None:
-            time.sleep(0.05)
-            try:
-                energy_used += p.cpu_percent() * 0.0001
-            except:
-                pass
-    except:
-        pass
+        result = subprocess.run(
+            cmd,
+            input=input_code,
+            text=True,
+            capture_output=True,
+            timeout=10
+        )
+    except Exception as e:
+        return {"error": str(e)}
 
-    stdout, stderr = process.communicate()
+    end = time.perf_counter()
+    duration = end - start
+
+    # Fake energy model (simple constant multiplier)
+    energy = duration * 0.13  
+
+    os.remove(tmp_path)
 
     return {
-        "return_code": process.returncode,
-        "stdout": stdout,
-        "stderr": stderr,
-        "time": round(time.time() - start, 3),
-        "energy": round(energy_used, 4)
+        "energy": energy,
+        "time": duration,
+        "stdout": result.stdout.strip(),
+        "stderr": result.stderr.strip(),
+        "return_code": result.returncode
     }
