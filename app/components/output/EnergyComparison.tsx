@@ -20,6 +20,10 @@ export function EnergyComparison({ patternAnalysis, realMeasurement, language }:
     );
   }
 
+  const measurementMethodLabel = realMeasurement?.measurement_method === "codecarbon" 
+    ? "CodeCarbon - Real Hardware" 
+    : "Process Monitoring";
+
   return (
     <div className="space-y-6 p-6 overflow-auto h-full">
       {/* Header */}
@@ -87,7 +91,7 @@ export function EnergyComparison({ patternAnalysis, realMeasurement, language }:
           <div className="flex items-center gap-2">
             <Cpu className="w-5 h-5 text-blue-400" />
             <h4 className="font-medium text-slate-300">Real Hardware Measurement</h4>
-            <span className="text-xs text-slate-500">(CodeCarbon)</span>
+            <span className="text-xs text-slate-500">({measurementMethodLabel})</span>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -121,6 +125,12 @@ export function EnergyComparison({ patternAnalysis, realMeasurement, language }:
             />
           </div>
 
+          {/* Hardware Info */}
+          <div className="p-3 bg-slate-800/30 rounded-lg border border-slate-700/30">
+            <p className="text-xs text-slate-400 mb-1">Tracking Method:</p>
+            <p className="text-xs text-slate-300">{realMeasurement.hardware.cpu_energy}</p>
+          </div>
+
           {/* Comparison */}
           {patternAnalysis && (
             <div className="mt-4 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
@@ -145,14 +155,14 @@ export function EnergyComparison({ patternAnalysis, realMeasurement, language }:
         </div>
       )}
 
-      {/* Python Only Notice */}
-      {language !== "python" && !realMeasurement && patternAnalysis && (
-        <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
-          <p className="text-sm text-amber-300">
-            ℹ️ Real hardware measurement only available for Python code
-          </p>
-        </div>
-      )}
+      {/* Info about measurement methods */}
+      <div className="p-4 bg-slate-800/30 border border-slate-700/30 rounded-lg">
+        <p className="text-xs text-slate-400 mb-1">ℹ️ Measurement Info:</p>
+        <ul className="text-xs text-slate-500 space-y-1 ml-4">
+          <li>• Python: CodeCarbon (real hardware via RAPL/TDP)</li>
+          <li>• JavaScript/C++/Java: Process monitoring (CPU + Memory estimation)</li>
+        </ul>
+      </div>
     </div>
   );
 }
@@ -184,3 +194,5 @@ function MetricCard({ label, value, unit, color, icon: Icon }: {
     </div>
   );
 }
+
+

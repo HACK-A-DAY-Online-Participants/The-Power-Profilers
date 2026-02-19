@@ -110,6 +110,43 @@ const PATTERNS: Record<string, PatternMatch[]> = {
       suggestion: "Multiple cout calls. Consider buffering output or using single stream.",
     },
   ],
+  java: [
+    {
+      type: "loop",
+      pattern: /for\s*\([^)]*\)\s*\{[\s\S]*?for\s*\([^)]*\)/gm,
+      baseScore: 0.85,
+      energyMultiplier: 1.5,
+      suggestion: "Nested loops detected. Consider using HashMap for O(1) lookup instead of O(n²).",
+    },
+    {
+      type: "memory",
+      pattern: /new\s+\w+\s*\([^)]*\)[\s\S]*?new\s+\w+\s*\(/gm,
+      baseScore: 0.55,
+      energyMultiplier: 1.0,
+      suggestion: "Multiple object allocations. Consider object pooling or reusing objects.",
+    },
+    {
+      type: "algorithm",
+      pattern: /\.add\([^)]*\)[\s\S]*?\.add\([^)]*\)/gm,
+      baseScore: 0.5,
+      energyMultiplier: 0.9,
+      suggestion: "Multiple ArrayList.add() calls. Consider using addAll() or initializing with capacity.",
+    },
+    {
+      type: "algorithm",
+      pattern: /\+\s*=\s*["'][^"']*["']/gm,
+      baseScore: 0.6,
+      energyMultiplier: 1.1,
+      suggestion: "String concatenation with += creates many objects. Use StringBuilder for better performance.",
+    },
+    {
+      type: "io",
+      pattern: /System\.out\.println[\s\S]*?System\.out\.println/gm,
+      baseScore: 0.4,
+      energyMultiplier: 0.7,
+      suggestion: "Multiple println calls. Consider buffering output or using single print statement.",
+    },
+  ],
 };
 
 function getLineNumber(code: string, index: number): number {
@@ -146,7 +183,7 @@ export function analyzeEnergy(language: SupportedLanguage, code: string): Energy
       hotspots.push({
         startLine,
         endLine,
-        score: pattern.baseScore + Math.random() * 0.1, // Add slight variance
+        score: pattern.baseScore + Math.random() * 0.1,
         estimate_mJ: Math.round(estimate_mJ * 100) / 100,
         suggestion: pattern.suggestion,
         type: pattern.type,
@@ -172,7 +209,7 @@ export function analyzeEnergy(language: SupportedLanguage, code: string): Energy
   
   return {
     fileScore: Math.round(fileScore * 100) / 100,
-    hotspots: hotspots.slice(0, 10), // Limit to top 10 hotspots
+    hotspots: hotspots.slice(0, 10),
     totalEstimate_mJ: Math.round(totalEstimate_mJ * 100) / 100,
     suggestions,
   };

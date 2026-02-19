@@ -1,36 +1,150 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ⚡ Code Energy Profiler
 
-## Getting Started
+> **Measure, analyze, and optimize your code's energy consumption in real-time**
 
-First, run the development server:
+A full-stack web application that helps developers write energy-efficient code by providing real-time energy measurements, AI-powered optimization suggestions, and multi-language support.
+
+[![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)](https://www.typescriptlang.org/)
+[![Python](https://img.shields.io/badge/Python-3.11-green)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/Flask-3.0-lightgrey)](https://flask.palletsprojects.com/)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+![Demo Screenshot](demo-screenshot.png)
+
+---
+
+## 🌟 Features
+
+- ⚡ **Real-time Energy Measurement** - Track actual CPU, GPU, and RAM energy consumption
+- 🤖 **AI-Powered Optimization** - Get intelligent suggestions to improve code efficiency
+- 🌍 **Multi-Language Support** - JavaScript, Python, C++, and Java
+- 📊 **Energy Analytics** - Visualize hotspots, metrics, and carbon footprint
+- 🎨 **Modern UI** - Dark/Light themes with Monaco Editor (VS Code experience)
+- 💾 **Code Persistence** - Auto-save your code across sessions
+- 🔒 **Secure Execution** - Sandboxed code execution with timeout limits
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+Make sure you have the following installed:
+
+- **Node.js** 18+ ([Download](https://nodejs.org/))
+- **Python** 3.10+ ([Download](https://www.python.org/))
+- **Git** ([Download](https://git-scm.com/))
+
+**For full language support, also install:**
+- **GCC/G++** for C++ support
+- **OpenJDK** 15+ for Java support
+
+---
+
+### 1️⃣ Clone the Repository
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/Anik-08/Code-profiler-website.git
+cd Code-profiler-website
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 2️⃣ Frontend Setup (Next.js)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+# Install dependencies
+npm install
+# or
+yarn install
+# or
+pnpm install
 
-## Learn More
+# Create environment file
+cp .env.example .env.local
 
-To learn more about Next.js, take a look at the following resources:
+# Start development server
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The frontend will be available at **http://localhost:3000**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+### 3️⃣ Backend Setup (Python Service)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Open a **new terminal window**:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+# Navigate to Python service
+cd python-service
+
+# Create virtual environment
+python -m venv venv
+
+# Activate virtual environment
+# On macOS/Linux:
+source venv/bin/activate
+
+# On Windows:
+venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Start the backend service
+python energy_service.py
+```
+
+The backend will be available at **http://localhost:5001**
+
+---
+
+### 4️⃣ Verify Installation
+
+Open your browser and navigate to **http://localhost:3000**
+
+You should see:
+- ✅ Code editor with syntax highlighting
+- ✅ Language selector (JavaScript, Python, C++, Java)
+- ✅ Run & Analyze buttons
+- ✅ Theme toggle (sun/moon icon)
+
+**Test the setup:**
+1. Select a language
+2. Click "Run & Analyze"
+3. Check if energy metrics appear
+
+---
+
+## 🚀 Quick Start Guide
+
+### 5-Minute Setup
+
+### Step 1: Clone and Install
+```bash
+git clone https://github.com/Anik-08/Code-profiler-website.git
+cd Code-profiler-website
+npm install
+```
+
+### Step 2: Setup Backend
+```bash
+cd python-service
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+python energy_service.py
+```
+
+### Step 3: Start Frontend
+```bash
+# In new terminal, from project root
+npm run dev
+```
+
+### Step 4: Open Browser
+Visit http://localhost:3000
+
+**That's it! 🎉**

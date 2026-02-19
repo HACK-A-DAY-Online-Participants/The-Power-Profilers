@@ -46,6 +46,26 @@ int main() {
     for (int x : dup) cout << x << " ";
     return 0;
 }`,
+
+  java: `// Find duplicates in array (Java)
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        int[] nums = {1, 2, 3, 2, 4, 3};
+        List<Integer> dup = new ArrayList<>();
+        
+        for (int i = 0; i < nums.length; i++) {
+            for (int j = i + 1; j < nums.length; j++) {
+                if (nums[i] == nums[j]) {
+                    dup.add(nums[i]);
+                }
+            }
+        }
+        
+        System.out.println(dup);
+    }
+}`,
 };
 
 export const LANGUAGE_CONFIG: Record<SupportedLanguage, {
@@ -75,6 +95,13 @@ export const LANGUAGE_CONFIG: Record<SupportedLanguage, {
     pistonLang: "c++",
     pistonVersion: "10.2.0",
     extension: ".cpp",
+  },
+  java: {
+    label: "Java",
+    monacoLang: "java",
+    pistonLang: "java",
+    pistonVersion: "15.0.2",
+    extension: ".java",
   },
 };
 

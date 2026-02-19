@@ -39,7 +39,7 @@ export function useEnergyAnalysis() {
     }
   }, []);
 
-  // Real measurement using CodeCarbon (NEW)
+  // Real measurement using energy service (NEW - supports all languages)
   const measureReal = useCallback(async (language: SupportedLanguage, code: string) => {
     setIsMeasuring(true);
     setError(null);
@@ -53,26 +53,33 @@ export function useEnergyAnalysis() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || errorData.hint || "Measurement failed");
+        // If service is not available, just log it but don't show as error
+        console.warn("Energy measurement service:", errorData.error || errorData.hint);
+        setRealMeasurement(null);
+        return;
       }
 
       const data = await response.json();
       setRealMeasurement(data);
     } catch (err) {
-      setError((err as Error).message);
+      // Service not available - don't show error, just skip real measurement
+      console.warn("Energy measurement service not available:", (err as Error).message);
       setRealMeasurement(null);
     } finally {
       setIsMeasuring(false);
     }
   }, []);
 
-  // Run both analyses
+  // Run both analyses (UPDATED - now runs for ALL languages)
   const analyzeBoth = useCallback(async (language: SupportedLanguage, code: string) => {
-    // Always run pattern analysis
+    // Always run pattern analysis first
     await analyzePattern(language, code);
 
-    // Run real measurement only for Python
-    if (language === "python") {
+    // Run real measurement for ALL supported languages
+    // The service now supports: python, javascript, cpp, java
+    const supportedLanguages: SupportedLanguage[] = ["python", "javascript", "cpp", "java"];
+    
+    if (supportedLanguages.includes(language)) {
       await measureReal(language, code);
     } else {
       setRealMeasurement(null);
